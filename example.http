@@ -1,0 +1,41 @@
+# Get list of dashboards
+GET http://localhost:9876/plugins/dashboard/api/
+
+###
+
+# Create dashboard
+POST http://localhost:9876/plugins/dashboard/api/
+
+{
+    "name": "test"
+}
+
+###
+
+# Get single dashboards
+GET http://localhost:9876/plugins/dashboard/api/2e9ef74b-948b-4a86-b64c-570b51c1b8dc
+
+###
+
+# Patch dashboard
+PATCH http://localhost:9876/plugins/dashboard/api/2e9ef74b-948b-4a86-b64c-570b51c1b8dc
+
+{
+    "size": {
+        "width": 1,
+        "height": 1
+    },
+    "tiles": [
+        {
+            "position": {
+                "x": 2,
+                "y": 2
+            },
+            "size": {
+                "width": 1,
+                "height": 1
+            },
+            "controls": []
+        }
+    ]
+}
