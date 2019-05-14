@@ -1,11 +1,11 @@
 <template>
     <div>
-        <component v-if="ruleComponent" :is="ruleComponent" :rule-id="ruleId"></component>
+        <component v-if="ruleComponent" :is="ruleComponent" :rule="rule"></component>
     </div>
 </template>
 
 <script>
-    import axios from "axios"
+    import Client from "@/QozyClient.js"
 
     import ScriptRule from "./ScriptRule.vue";
 
@@ -35,15 +35,8 @@
                 return null
             }
         },
-        methods: {
-            async getRule() {
-                const result = await axios.get(`/api/rules/${this.ruleId}`)
-
-                return result.data
-            }
-        },
         async mounted() {
-            this.rule = await this.getRule()
+            this.rule = await Client.getRule(this.ruleId)
         }
     }
 </script>

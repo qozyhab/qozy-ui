@@ -18,7 +18,7 @@
                 <div class="row">
                     <div class="col-12">
                         <transition-group name="fade" tag="div">
-                            <bridge v-for="bridge in bridges" :key="bridge" :bridge-id="bridge" class="mb-2" @remove="removeBridge(bridge)"></bridge>
+                            <bridge v-for="bridge in bridges" :key="bridge.id" :bridge="bridge" class="mb-2" @remove="removeBridge(bridge)"></bridge>
                         </transition-group>
                     </div>
                 </div>
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-    import axios from "axios"
+    import Client from "@/QozyClient.js"
     import Bridge from "./Bridge.vue"
 
     export default {
@@ -40,27 +40,20 @@
             }
         },
         methods: {
-            async getBridges() {
-                const result = await axios.get("/api/bridges")
-
-                return result.data
-            },
             async addBridge(bridgeType) {
-                await axios.post("/api/bridges", JSON.stringify(bridgeType))
+                await Client.createBridge(bridgeType)
 
-                this.bridges = await this.getBridges()
+                this.bridges = await Client.getBridges()
             },
-            async removeBridge(bridgeId) {
-                await axios.delete(`/api/bridges/${bridgeId}`)
+            async removeBridge(bridge) {
+                await bridge.remove()
 
-                this.bridges = await this.getBridges()
+                this.bridges = await Client.getBridges()
             }
         },
         async mounted() {
-            this.bridges = await this.getBridges()
-
-            const result = await axios.get("/api/bridges/types")
-            this.bridgeTypes = result.data
+            this.bridges = await Client.getBridges()
+            this.bridgeTypes = await Client.getBridgeTypes()
         }
     }
 </script>

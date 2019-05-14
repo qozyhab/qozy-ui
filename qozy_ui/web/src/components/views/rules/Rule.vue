@@ -15,7 +15,7 @@
                     </ul>
                 </div>
 
-                <h4><router-link :to="{name: 'rule', params: {ruleId: ruleId}}">{{rule.name || rule.id}}</router-link></h4>
+                <h4><router-link :to="{name: 'rule', params: {ruleId: rule.id}}">{{rule.name || rule.id}}</router-link></h4>
                 <small v-if="rule.name">{{rule.id}}</small>
             </div>
         </div>
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-    import axios from "axios"
+    import {Rule} from "@/QozyClient.js"
 
     import EditableText from "@/components/EditableText.vue"
     import ChannelValue from "@/components/ChannelValue.vue"
@@ -34,36 +34,18 @@
         name: "Rule",
         components: {EditableText, ChannelValue},
         props: {
-            ruleId: {
-                type: String,
+            rule: {
+                type: Rule,
                 required: true
             }
         },
-        data() {
-            return {
-                rule: null,
-                online: null
-            }
-        },
         methods: {
-            async getRule() {
-                const result = await axios.get(`/api/rules/${this.ruleId}`)
-
-                return result.data
-            },
             async remove() {
-                if (await Confirm("Remove Rule", "Are you sure to remove Rule " + this.ruleId + "?")) {
+                if (await Confirm("Remove Rule", "Are you sure to remove Rule " + this.rule.id + "?")) {
                     this.$emit('remove')
                 }
             }
-        },
-        async mounted() {
-            try {
-                this.rule = await this.getRule()
-            } catch(e) {
-                this.rule = {}
-            }
-        },
+        }
     }
 </script>
 

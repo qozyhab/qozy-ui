@@ -39,6 +39,8 @@
 <script>
     import axios from "axios"
 
+    import Client from "@/QozyClient.js"
+
     import Dashboard from "./Dashboard.vue"
     import Expression from "@/components/expression/Expression.vue"
 
@@ -66,8 +68,7 @@
             let result = await axios.get("/ui/api/dashboard")
             this.dashboards = result.data
 
-            result = await axios.get("/api/notifications")
-            this.notifications = result.data
+            this.notifications = await Client.getNotifications()
         }
     }
 </script>

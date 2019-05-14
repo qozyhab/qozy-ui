@@ -20,9 +20,7 @@
         <div class="col-lg-10">
             <div class="row">
                 <div class="col-12">
-                    <transition-group name="fade" tag="div">
-                        <rule v-for="rule in rules" :key="rule" :rule-id="rule" class="mb-2" @remove="removeRule(rule)"></rule>
-                    </transition-group>
+                        <rule v-for="rule in rules" :key="rule.id" :rule="rule" class="mb-2" @remove="removeRule(rule)"></rule>
                 </div>
             </div>
         </div>
@@ -30,7 +28,7 @@
 </template>
 
 <script>
-    import axios from "axios"
+    import Client from "@/QozyClient.js"
 
     import Rule from "./Rule.vue"
 
@@ -43,23 +41,19 @@
             }
         },
         methods: {
-            async getRules() {
-                const result = await axios.get("/api/rules")
-
-                return result.data
-            },
             async createScriptRule() {
-                await axios.post("/api/rules/script")
-                this.rules = await this.getRules()
-            },
-            async removeRule(ruleId) {
-                await axios.delete(`/api/rules/${ruleId}`)
+                await Client.createRule()
 
-                this.rules = await this.getRules()
+                this.rules = await Client.getRules()
+            },
+            async removeRule(rule) {
+                await rule.remove()
+
+                this.rules = await Client.getRules()
             }
         },
         async mounted() {
-            this.rules = await this.getRules()
+            this.rules = await Client.getRules()
         }
     }
 </script>

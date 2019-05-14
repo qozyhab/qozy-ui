@@ -43,8 +43,7 @@
 </template>
 
 <script>
-    import axios from "axios"
-
+    import {Thing} from "@/QozyClient.js"
     import EditableText from "@/components/EditableText.vue"
     import ChannelValue from "@/components/ChannelValue.vue"
 
@@ -54,38 +53,28 @@
         name: 'thing',
         components: {EditableText, ChannelValue},
         props: {
-            thingId: {
-                type: String,
+            thing: {
+                type: Thing,
                 required: true
             }
         },
         data() {
             return {
-                thing: null,
                 online: null
             }
         },
         methods: {
-            async getThing() {
-                const result = await axios.get(`/api/things/${this.thingId}`)
-
-                return result.data
-            },
             async remove() {
                 if (await Confirm("Remove Thing", "Are you sure to remove Thing " + this.thingId + "?")) {
                     this.$emit('remove')
                 }
             },
             async updateName(value) {
-                await axios.put(`/api/things/${this.thingId}/name`, JSON.stringify(value))
-                this.thing.name = value
+                await this.thing.setName(value)
             }
         },
         async mounted() {
-            this.thing = await this.getThing()
-
-            const result = await axios.get(`/api/things/${this.thingId}/online`)
-            this.online = result.data
+            this.online = await this.thing.isOnline()
         },
     }
 </script>

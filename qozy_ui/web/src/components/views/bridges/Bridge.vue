@@ -14,7 +14,7 @@
                             <span v-if="!bridge.active" @click="activate()"><icon icon="play-circle" fixed-width></icon> Activate</span>
                             <span v-else @click="deactivate()"><icon icon="stop-circle" fixed-width></icon> Deactivate</span>
                         </li>
-                        <router-link tag="li" :to="{name: 'bridge_settings', params: {bridgeId: bridgeId}}">
+                        <router-link tag="li" :to="{name: 'bridge_settings', params: {bridgeId: bridge.id}}">
                             <icon icon="cogs" fixed-width></icon> Settings
                         </router-link>
                         <li @click="remove()"><icon icon="trash" fixed-width></icon> Remove</li>
@@ -34,7 +34,7 @@
                         <span v-if="bridge.active" class="color-okay"><icon icon="check"></icon></span>
                         <span v-else class="color-bad"><icon icon="times"></icon></span>
                     </li>
-                    <li>Things: {{Object.keys(bridge.things).length}}</li>
+                    <li>Things: {{things.length}}</li>
                 </ul>
             </div>
         </div>
@@ -42,49 +42,39 @@
 </template>
 
 <script>
-    import axios from "axios"
-
+    import {Bridge} from "@/QozyClient.js"
     import {Confirm} from "@/utils.js"
 
     export default {
         name: 'bridges',
         props: {
-            bridgeId: {
-                type: String,
+            bridge: {
+                type: Bridge,
                 required: true
             }
         },
         data() {
             return {
-                bridge: null,
-                running: null
+                running: null,
+                things: []
             }
         },
         methods: {
-            async getBridge() {
-                const result = await axios.get(`/api/bridges/${this.bridgeId}`)
-
-                return result.data
-            },
             async activate() {
-                await axios.post(`/api/bridges/${this.bridgeId}/activate`)
-                this.bridge = await this.getBridge()
+                await this.bridge.activate()
             },
             async deactivate() {
-                await axios.post(`/api/bridges/${this.bridgeId}/deactivate`)
-                this.bridge = await this.getBridge()
+                await this.bridge.deactivate()
             },
             async remove() {
-                if (await Confirm("Remove Bridge", "Are you sure to remove Bridge " + this.bridgeId + "?")) {
+                if (await Confirm("Remove Bridge", "Are you sure to remove Bridge " + this.bridge.id + "?")) {
                     this.$emit('remove')
                 }
             }
         },
         async mounted() {
-            this.bridge = await this.getBridge()
-
-            const result = await axios.get(`/api/bridges/${this.bridgeId}/running`)
-            this.running = result.data
+            this.running = await this.bridge.isRunning()
+            this.things = await this.bridge.getThings()
         },
     }
 </script>

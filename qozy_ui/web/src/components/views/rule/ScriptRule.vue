@@ -74,7 +74,7 @@
 </template>
 
 <script>
-    import axios from "axios"
+    import {Rule} from "@/QozyClient.js"
 
     import EditableText from "@/components/EditableText.vue"
     import Expression from "@/components/expression/Expression.vue"
@@ -88,48 +88,36 @@
         name: "ScriptRule",
         components: {EditableText, Expression, codemirror},
         props: {
-            ruleId: {
-                type: String,
+            rule: {
+                type: Rule,
                 required: true
             }
         },
         data() {
             return {
-                rule: null,
                 conditionState: null,
                 conditionCheckRunning: false
             }
         },
         methods: {
-            async getRule() {
-                const result = await axios.get(`/api/rules/${this.ruleId}`)
-
-                return result.data
-            },
             async updateName(name) {
-                await axios.patch(`/api/rules/${this.ruleId}`, {name: name})
-                this.rule = await this.getRule()
+                await this.rule.setName(name)
             },
             async save() {
-                await axios.patch(`/api/rules/${this.ruleId}`, {condition: this.rule.condition, script: this.rule.script})
-                this.rule = await this.getRule()
+                await this.rule.save()
 
                 Toast("Rule saved")
             },
             async checkCondition() {
                 this.conditionCheckRunning = true
-                const result = await axios.get(`/api/rules/${this.ruleId}/condition`)
-                this.conditionState = result.data
+                this.conditionState = await this.rule.checkCondition()
                 this.conditionCheckRunning = false
             },
             async execute() {
-                await axios.get(`/api/rules/${this.ruleId}/execute`)
+                await this.rule.execute()
                 Toast("Executed Rule")
             }
         },
-        async mounted() {
-            this.rule = await this.getRule()
-        }
     }
 </script>
 

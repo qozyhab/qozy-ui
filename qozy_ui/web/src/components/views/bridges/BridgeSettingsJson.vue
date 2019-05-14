@@ -6,7 +6,7 @@
 </template>
 
 <script>
-    import axios from "axios"
+    import Client from "@/QozyClient.js"
 
     import JsonSchemaForm from "@/components/JsonSchema/JsonSchemaForm.vue"
 
@@ -26,17 +26,12 @@
             }
         },
         methods: {
-            async getBridge() {
-                const result = await axios.get(`/api/bridges/${this.bridgeId}`)
-
-                return result.data
-            },
             async saveSettings(settings) {
-                await axios.put(`/api/bridges/${this.bridgeId}/settings`, settings)
+                await this.bridge.setSettings(settings)
             }
         },
         async mounted() {
-            this.bridge = await this.getBridge()
+            this.bridge = await Client.getBridge(this.bridgeId)
             this.settingsJson = JSON.stringify(this.bridge.settings, null, 4)
         },
     }
